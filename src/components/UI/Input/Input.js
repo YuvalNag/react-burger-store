@@ -3,25 +3,29 @@ import React from 'react'
 import classes from './Input.module.css'
 
 const Input = (props) => {
+    let inputElmclass = [classes.InputElm]
+    if (!props.valid) {
+        inputElmclass.push(classes.InValid)
+    }
     let inputElm;
     switch (props.elementType) {
         case 'input':
             inputElm = <input
-                className={classes.InputElm}
+                className={inputElmclass.join(' ')}
                 {...props.elementConfig}
                 value={props.value}
                 onChange={props.changed} />
             break;
         case 'textarea':
             inputElm = <textarea
-                className={classes.InputElm}
+                className={inputElmclass.join(' ')}
                 {...props.elementConfig}
                 value={props.value}
                 onChange={props.changed} />
             break;
         case 'select':
             inputElm = (<select
-                className={classes.InputElm}
+                className={inputElmclass.join(' ')}
                 value={props.value}
                 onChange={props.changed}>
                 {props.elementConfig.options.map(option =>
@@ -34,7 +38,7 @@ const Input = (props) => {
             break;
         default:
             inputElm = <input
-                className={classes.InputElm}
+                className={inputElmclass.join(' ')}
                 {...props.elementConfig}
                 value={props.value}
                 onChange={props.changed} />
@@ -44,6 +48,10 @@ const Input = (props) => {
         <div className={classes.Input}>
             <label className={classes.Label}>{props.label}</label>
             {inputElm}
+            {props.validationError ?
+                <p className={classes.ValidationError}>{props.validationError}</p>
+                : null
+            }
         </div>
     )
 }
