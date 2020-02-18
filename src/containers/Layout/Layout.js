@@ -3,6 +3,9 @@ import classes from './Layout.module.css'
 import Toolbar from '../../components/Navigation/Toolbar/Toolbar'
 import SideDrawer from '../../components/Navigation/SideDrawer/SideDrawer'
 
+import * as actions from '../../store/actions'
+import { connect } from "react-redux";
+
 
 class Layout extends Component {
     state = {
@@ -16,8 +19,8 @@ class Layout extends Component {
     render() {
         return (
             <Fragment>
-                <Toolbar managedSideDrawer={this.sideDrawerToggleHandler} />
-                <SideDrawer show={this.state.showSideDrawer} managedSideDrawer={this.sideDrawerToggleHandler} />
+                <Toolbar logoutClicked={this.props.onLogout} isAuth={this.props.isAuth} managedSideDrawer={this.sideDrawerToggleHandler} />
+                <SideDrawer logoutClicked={this.props.onLogout} isAuth={this.props.isAuth} show={this.state.showSideDrawer} managedSideDrawer={this.sideDrawerToggleHandler} />
                 <main className={classes.Content}>
                     {this.props.children}
                 </main>
@@ -25,4 +28,14 @@ class Layout extends Component {
         )
     }
 }
-export default Layout
+const mapStateToProps = state => {
+    return {
+        isAuth: state.auth.idToken !== null
+    }
+}
+const mapDispatchToProps = dispatch => {
+    return {
+        onLogout: () => dispatch(actions.logout())
+    }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(Layout)

@@ -8,6 +8,8 @@ import Input from '../../../components/UI/Input/Input'
 import classes from './ContactData.module.css'
 import { connect } from 'react-redux'
 
+import * as orderActions from '../../../store/actions/index'
+
 class ContactData extends Component {
     state = {
         orderFrom: {
@@ -82,32 +84,27 @@ class ContactData extends Component {
                 value: 'fastest',
                 touched: true,
                 valid: true,
-                validationRules: null
+                validationRules: {}
             }
         },
-        formIsValid: false,
-        isLoading: false
+        formIsValid: false
     }
     orderHandler = (event) => {
         event.preventDefault()
         if (this.state.formIsValid) {
 
-            this.setState({ isLoading: true })
             const fromData = {}
             for (const key in this.state.orderFrom) {
                 fromData[key] = this.state.orderFrom[key].value
             }
             const order = {
                 ingredients: this.props.ingredients,
-                customer: fromData
+                customer: fromData,
+                userId: this.props.userId
             }
-            axios.post('/orders.json', order)
-                .then(response => {
-                    this.setState({ isLoading: false })
-                    this.props.history.replace('/')
 
-                })
-                .catch(error => { this.setState({ isLoading: false }) })
+            this.props.onPurchase(order, this.props.token)
+
         }
     }
     inputChangedHandler = (event, inputId) => {
@@ -125,7 +122,7 @@ class ContactData extends Component {
 
         for (const key in updatedOrderFrom) {
             formIsValid = formIsValid && updatedOrderFrom[key].valid && updatedOrderFrom[key].touched
-        } 
+        }
         this.setState({ orderFrom: updatedOrderFrom, formIsValid: formIsValid })
     }
 
@@ -168,12 +165,13 @@ class ContactData extends Component {
         return re.test(email);
     }
 
-    componentDidMount() {
-        if (this.props.ingredients.length <= 0) {
+    componentDidUpdate() {
+        if (this.props.purchased) {
+            this.props.onPurchaseFinish()
             this.props.history.push('/burger-builder')
         }
     }
-    
+
     render() {
         const formElementsArray = []
         for (const key in this.state.orderFrom) {
@@ -186,7 +184,7 @@ class ContactData extends Component {
 
         return (
             <div className={classes.ContactData}>
-                {(this.state.isLoading) ? <Spinner /> :
+                {(this.props.isLoading) ? <Spinner /> :
                     <form onSubmit={this.orderHandler}>
                         <h4>Enter your Contact Data</h4>
                         {formElementsArray.map(formElement => <Input key={formElement.key} {...formElement.data} changed={(event) => { this.inputChangedHandler(event, formElement.key) }} />)}
@@ -199,9 +197,19 @@ class ContactData extends Component {
     }
 }
 
-const mapStateToProps = state=>{
+const mapStateToProps = state => {
     return {
-        ingredients:state.ingredients
+        ingredients: state.burgerBuilder.ingredients,
+        isLoading: state.reqToServer.loading,
+        purchased: state.order.purchased,
+        token: state.auth.idToken,
+        userId: state.auth.localId
     }
 }
-export default connect(mapStateToProps)(withErrorHandler(ContactData, axios))
+const mapDispatchToProps = dispatch => {
+    return {
+        onPurchase: (order, token) => dispatch(orderActions.tryPurchaseBurger(order, token)),
+        onPurchaseFinish: () => dispatch(orderActions.purchaseBurgerFinish())
+    }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(withErrorHandler(ContactData, axios))
