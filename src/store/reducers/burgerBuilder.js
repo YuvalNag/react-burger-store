@@ -1,5 +1,5 @@
 import * as actionTypes from '../actions/actionTypes';
-import { updateObject, removeItem } from '../utility'
+import { updateObject, removeItem } from '../../shared/utility'
 
 // const INGREDIENTS_PRICES = {
 //     'meat': 10,

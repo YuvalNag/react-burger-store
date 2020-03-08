@@ -4,7 +4,7 @@ import classes from './Modal.module.css'
 
 const Modal = (props) => {
     useEffect(() => {
-        console.log('update')
+        // console.log('update')
       }, [props.show]); // Only re-run the effect if count changes
     return (
     <Fragment>

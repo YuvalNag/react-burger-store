@@ -8,6 +8,7 @@ import * as actions from '../../store/actions/index'
 import { connect } from 'react-redux';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import { Redirect } from 'react-router-dom';
+import { checkValidity } from '../../shared/utility'
 
 const ERRORS = {
     EMAIL_NOT_FOUND: 'There is no user record corresponding to this identifier.The user may have been deleted.',
@@ -64,73 +65,10 @@ class Auth extends Component {
         this.setState(prevState => { return { isSignIn: !prevState.isSignIn } })
     }
     inputChangedHandler = (event, inputId) => {
-        const updatedFrom = { ...this.state.controls }
-        const updatedFromElement = { ...updatedFrom[inputId] }
-        updatedFromElement.value = event.target.value
-        const { isValid, validationError } = this.validator(updatedFromElement.value, updatedFromElement.validationRules)
-        updatedFromElement.valid = isValid
-        updatedFromElement.touched = true
-        updatedFromElement.validationError = validationError
-
-        updatedFrom[inputId] = updatedFromElement
-
-        let formIsValid = true
-
-        for (const key in updatedFrom) {
-            formIsValid = formIsValid && updatedFrom[key].valid && updatedFrom[key].touched
-        }
+        const { updatedFrom, formIsValid } = checkValidity(event.target.value, inputId, this.state.controls)
         this.setState({ controls: updatedFrom, formIsValid: formIsValid })
     }
 
-    validator = (value, validationRules) => {
-        let isValid = true
-        let validationError = null
-
-        if (validationRules.required) {
-            isValid = isValid && value.trim() !== ''
-            if (!isValid) {
-                validationError = "This field is required!"
-            }
-        }
-
-        if (validationRules.between) {
-            isValid = isValid && value.trim().length >= validationRules.between[0] && value.trim().length <= validationRules.between[1]
-            if (!isValid) {
-
-                if (value.trim().length > validationRules.between[1]) validationError = "This field is too long!"
-                if (value.trim().length < validationRules.between[0]) validationError = "This field is too short!"
-            }
-        }
-
-        // if (validationRules.intValue) {
-        //     isValid = isValid && typeof value == 'number' && 0 === value % parseInt(value)
-        // }
-
-        if (validationRules.isPassword) {
-            isValid = isValid && this.validatePassword(value)
-            if (!isValid) {
-                validationError = "This password is not strong enough!"
-
-            }
-        }
-        if (validationRules.isEmail) {
-            isValid = isValid && this.validateEmail(value)
-            if (!isValid) {
-                validationError = "This email is not valid!"
-
-            }
-        }
-
-        return { isValid: isValid, validationError: validationError }
-    }
-    validatePassword = (password) => {
-        var re = /^[A-Za-z]\w{7,14}$/;
-        return re.test(password);
-    }
-    validateEmail = (email) => {
-        var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return re.test(email);
-    }
     render() {
         const formElementsArray = []
         for (const key in this.state.controls) {
@@ -146,7 +84,7 @@ class Auth extends Component {
                     <form onSubmit={this.submitHandler}>
                         <h1>Welcome <br></br> {this.state.isSignIn ? 'Sign in' : 'Sing up'} please</h1>
                         {formElementsArray.map(formElement => <Input key={formElement.key} {...formElement.data} changed={(event) => { this.inputChangedHandler(event, formElement.key) }} />)}
-                        {this.props.errorMessage ? <h3 style={{ color: 'red' }}>{ERRORS[this.props.errorMessage]?ERRORS[this.props.errorMessage]:this.props.errorMessage}</h3> : null}
+                        {this.props.errorMessage ? <h3 style={{ color: 'red' }}>{ERRORS[this.props.errorMessage] ? ERRORS[this.props.errorMessage] : this.props.errorMessage}</h3> : null}
 
                         <Button disabled={!this.state.formIsValid} btnType='Success' >SUBMIT</Button>
                     </form>}

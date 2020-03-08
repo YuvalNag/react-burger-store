@@ -10,9 +10,11 @@ import { connect } from 'react-redux'
 
 import * as orderActions from '../../../store/actions/index'
 
+import { checkValidity } from '../../../shared/utility'
+
 class ContactData extends Component {
     state = {
-        orderFrom: {
+        controls: {
             name: {
                 elementType: 'input',
                 elementConfig: {
@@ -94,8 +96,8 @@ class ContactData extends Component {
         if (this.state.formIsValid) {
 
             const fromData = {}
-            for (const key in this.state.orderFrom) {
-                fromData[key] = this.state.orderFrom[key].value
+            for (const key in this.state.controls) {
+                fromData[key] = this.state.controls[key].value
             }
             const order = {
                 ingredients: this.props.ingredients,
@@ -108,62 +110,11 @@ class ContactData extends Component {
         }
     }
     inputChangedHandler = (event, inputId) => {
-        const updatedOrderFrom = { ...this.state.orderFrom }
-        const updatedFromElement = { ...updatedOrderFrom[inputId] }
-        updatedFromElement.value = event.target.value
-        const { isValid, validationError } = this.validator(updatedFromElement.value, updatedFromElement.validationRules)
-        updatedFromElement.valid = isValid
-        updatedFromElement.touched = true
-        updatedFromElement.validationError = validationError
-
-        updatedOrderFrom[inputId] = updatedFromElement
-
-        let formIsValid = true
-
-        for (const key in updatedOrderFrom) {
-            formIsValid = formIsValid && updatedOrderFrom[key].valid && updatedOrderFrom[key].touched
-        }
-        this.setState({ orderFrom: updatedOrderFrom, formIsValid: formIsValid })
+        const { updatedFrom, formIsValid } = checkValidity(event.target.value, inputId, this.state.controls)
+        this.setState({ controls: updatedFrom, formIsValid: formIsValid })
     }
 
-    validator = (value, validationRules) => {
-        let isValid = true
-        let validationError = null
 
-        if (validationRules.required) {
-            isValid = isValid && value.trim() !== ''
-            if (!isValid) {
-                validationError = "This field is required!"
-            }
-        }
-
-        if (validationRules.between) {
-            isValid = isValid && value.trim().length >= validationRules.between[0] && value.trim().length <= validationRules.between[1]
-            if (!isValid) {
-
-                if (value.trim().length > validationRules.between[1]) validationError = "This field is too long!"
-                if (value.trim().length < validationRules.between[0]) validationError = "This field is too short!"
-            }
-        }
-
-        // if (validationRules.intValue) {
-        //     isValid = isValid && typeof value == 'number' && 0 === value % parseInt(value)
-        // }
-
-        if (validationRules.email) {
-            isValid = isValid && this.validateEmail(value)
-            if (!isValid) {
-                validationError = "This email is not valid!"
-
-            }
-        }
-        return { isValid: isValid, validationError: validationError }
-    }
-
-    validateEmail = (email) => {
-        var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return re.test(email);
-    }
 
     componentDidUpdate() {
         if (this.props.purchased) {
@@ -174,10 +125,10 @@ class ContactData extends Component {
 
     render() {
         const formElementsArray = []
-        for (const key in this.state.orderFrom) {
+        for (const key in this.state.controls) {
             formElementsArray.push({
                 key: key,
-                data: this.state.orderFrom[key]
+                data: this.state.controls[key]
             })
 
         }

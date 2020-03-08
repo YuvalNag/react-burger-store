@@ -33,7 +33,6 @@ export const initPrices = () => {
 
         axios.get('/prices.json')
             .then(response => {
-                console.log(Object.values(response.data)[0]);
                 dispatch(setPrices(Object.values(response.data)[0]))
             })
             .catch(error => {
