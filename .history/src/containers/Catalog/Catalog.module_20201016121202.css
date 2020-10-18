@@ -1,0 +1,17 @@
+.Catalog {
+    display: grid;
+    grid-gap: 1rem;
+    padding: 1rem;
+    margin: 0 auto;
+    font-family: var(--font-sans);
+  }
+  @media (min-width: 600px) {
+    .Catalog {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1200px) {
+    .Catalog {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }

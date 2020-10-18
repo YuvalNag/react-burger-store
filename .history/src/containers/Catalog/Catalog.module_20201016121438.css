@@ -1,0 +1,14 @@
+.Catalog {
+    display: flex;
+    flex-wrap: wrap;
+}
+  @media (min-width: 600px) {
+    .Catalog {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1200px) {
+    .Catalog {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
