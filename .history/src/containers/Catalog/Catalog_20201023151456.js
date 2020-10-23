@@ -1,16 +1,18 @@
+import React, { Fragment, useEffect, useState } from 'react';
+import Container from '@material-ui/core/Container';
 
-import React, { Fragment, useState } from 'react';
-
+import ProductCard from '../../components/ProductCard/ProductCard';
+import classes from './Catalog.module.css'
+import { BottomNavigation, BottomNavigationAction, Typography } from '@material-ui/core';
+import ShoppingCartOutlined from '@material-ui/icons/ShoppingCartOutlined';
 import { useDispatch, useSelector } from 'react-redux';
-import CreateProduct from '../../components/Burger/CreateProduct/CreateProduct';
+import * as catalogActions from '../../store/actions/index'
+import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
 import Modal from '../../components/UI/Modal/Modal';
-import Button from '../../components/UI/Button/Button';
-
-import * as adminActions from '../../store/actions/index'
 
 
 
-const products = [
+const mockProducts = [
     {
         title: `לביבות צ'יפס `,
         description: `2 ק''ג תפוגן אריזת חסכון
@@ -35,26 +37,98 @@ const products = [
         imageSrc: 'data:image/jpeg;base64,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',
     }
 ]
-const Admin = (props) => {
+const Catalog = (props) => {
     const dispatch = useDispatch();
     const token = useSelector(state => state.auth.idToken)
-    
-    const onAddProduct = (newProduct) => dispatch(adminActions.tryAddProduct(newProduct, token));
+
+    // const onAddToCart = (newProduct) => dispatch(catalogActions.tryAddProduct(newProduct,token));
+    // const onRemoveFromCart = (removedProduct) => dispatch(catalogActions.removeProduct(removedProduct,token))
+
+    // const selectedProducts = useSelector(state => state.catalog.selectedProducts)
+    const [selectedProducts, setSelectedProducts] = useState({})
+    console.log('selectedProducts', selectedProducts);
+    const onAddToCart = (productKey) => {
+        if (selectedProducts[productKey]) {
+            selectedProducts[productKey] = selectedProducts[productKey] + 1
+        }
+        else {
+            selectedProducts[productKey] = 1
+        }
+        setSelectedProducts({ ...selectedProducts })
+    };
+    const onRemoveFromCart = (productKey) => {
+        if (selectedProducts[productKey]) {
+            selectedProducts[productKey] = selectedProducts[productKey] - 1
+        }
+        else {
+            console.error('product key is not exist');
+        }
+        setSelectedProducts({ ...selectedProducts })
+    };
+    const products = useSelector(state => state.catalog.products)
+
     const [show, setShow] = useState(false)
+    const [showSnackbar, setShowSnackbar] = useState(false)
+
+    const handleClose = () => setShowSnackbar(false)
+    useEffect(() => dispatch(catalogActions.fetchProducts()), [])
+
+    const totalPrice = Object.keys(products)
+        .filter(productKey => selectedProducts[productKey])
+        .map(productKey => selectedProducts[productKey] * products[productKey].price)
+        .reduce((cur, sum) => cur + sum, 0);
+
+    const onPurchase = (customer) => {
+        dispatch(catalogActions.tryPurchaseBurger({ customer, products: selectedProducts, price: totalPrice }, token));
+        setShow(false);
+    };
     return (
         <Fragment>
+            <Snackbar open={showSnackbar} autoHideDuration={6000} onClose={handleClose}>
+                <Alert onClose={handleClose} severity="success">
+                    This is a success message!
+  </Alert>
+            </Snackbar>
             <Modal
                 show={show}
                 modelClosed={() => setShow(false)}
             >
-                <CreateProduct
+                <OrderSummary
 
                     purchaseCancelled={() => setShow(false)}
-                    purchaseContinued={onAddProduct} />
+                    purchaseContinued={onPurchase}
+                />
             </Modal>
-            <Button  btnType='Success'
-            clicked={() => setShow(true)}>הוסף מוצר</Button>
-        </Fragment>
+            <div
+                className={classes.Catalog}
+            >
+                {Object.keys(products).map(productKey => <ProductCard {...products[productKey]} amount={selectedProducts[productKey]} productKey={productKey} onAdd={() => onAddToCart(productKey)} onRemove={() => onRemoveFromCart(productKey)} />)}
+
+            </div>
+            <BottomNavigation
+                // value={value}
+                // onChange={(event, newValue) => {
+                //     setValue(newValue);
+                // }}
+                showLabels
+                // className={classes.footer}
+                style={{
+                    position: 'fixed',
+                    bottom: 0,
+                    // backgroundColor: '#e5e5c5',
+                    backgroundColor: '#CF8F2E',
+                    width: '100%'
+
+                }}
+            >
+
+                <BottomNavigationAction label="הזמן עכשיו" icon={<ShoppingCartOutlined />} onClick={() => setShow(true)} />
+                <Typography align="center" color='textSecondary' variant='p' component='p' style={{ alignSelf: 'center', fontWeight: 'bold' }}>
+                    סיכום:  ₪{totalPrice}
+
+                </Typography>
+            </BottomNavigation>
+        </Fragment >
     )
 }
-export default Admin
+export default Catalog

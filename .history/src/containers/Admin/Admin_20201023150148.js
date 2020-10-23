@@ -38,7 +38,6 @@ const products = [
 const Admin = (props) => {
     const dispatch = useDispatch();
     const token = useSelector(state => state.auth.idToken)
-    
     const onAddProduct = (newProduct) => dispatch(adminActions.tryAddProduct(newProduct, token));
     const [show, setShow] = useState(false)
     return (

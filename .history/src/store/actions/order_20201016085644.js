@@ -16,7 +16,7 @@ export const tryPurchaseBurger = (order, token) => {
     return dispatch => {
         dispatch(reqToServerStart())
         const queryParams = '?auth=' + token
-        axios.post('/orders.json', order)
+        axios.post('/orders.json' + queryParams, order)
             .then(response => {
                 dispatch(reqToServer(purchaseBurgerSuccess(response.data.name, order)))
 
