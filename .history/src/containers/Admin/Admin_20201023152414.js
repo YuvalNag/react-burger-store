@@ -60,7 +60,7 @@ const Admin = (props) => {
             </Modal>
             <Button btnType='Success'
                 clicked={() => setShow(true)}>הוסף מוצר</Button>
-                <h1> מספר הזמנות: {Object.values(orders).length}</h1>
+                <h1>{Object.values(orders).length} מספר ההזמנות שלך:</h1>
         </Fragment>
     )
 }
