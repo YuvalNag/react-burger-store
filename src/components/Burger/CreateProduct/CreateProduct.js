@@ -17,7 +17,7 @@ const CreateProduct = (props) => {
             <h3>הוסף מוצר</h3>
             <List noValidate autoComplete="off">
                 <ListItem>
-                    <TextField id="standard-basic"
+                    <TextField id="title"
                         label="שם"
                         value={title}
                         onChange={(event) => setTitle(event.target.value)}
@@ -26,7 +26,7 @@ const CreateProduct = (props) => {
                 <ListItem>
                     <TextField
                         label="מחיר"
-                        id="outlined-start-adornment"
+                        id="price"
                         value={price}
                         onChange={(event) => setPrice(event.target.value)}
 
@@ -38,7 +38,7 @@ const CreateProduct = (props) => {
                 </ListItem>
                 <ListItem>
                     <TextField
-                        id="standard-basic"
+                        id="description"
                         label="תיאור נוסף"
                         value={description}
                         onChange={(event) => setDescription(event.target.value)}
@@ -46,7 +46,7 @@ const CreateProduct = (props) => {
                 </ListItem>
                 <ListItem>
                     <TextField
-                        id="standard-basic"
+                        id="imageSrc"
                         label="קישור לתמונה"
                         value={imageSrc}
                         onChange={(event) => setImageSrc(event.target.value)}
@@ -55,7 +55,7 @@ const CreateProduct = (props) => {
 
             </List>
             <Button
-                clicked={() => props.purchaseContinued(
+                clicked={() => props.continued(
                     {
                         title,
                         description,
@@ -68,7 +68,7 @@ const CreateProduct = (props) => {
                 {/* </Link> */}
             </Button>
             <Button
-                clicked={props.purchaseCancelled}
+                clicked={props.cancelled}
                 btnType='Danger'>
                 בטל
                 </Button>

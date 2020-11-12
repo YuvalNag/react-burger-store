@@ -41,3 +41,30 @@ export const fetchProducts = () => {
             })
     }
 }
+
+const fetchRegionsSuccess = (regions) => {
+    return {
+        type: actionTypes.FETCH_REGIONS_SUCCESS,
+        regions: regions
+    }
+}
+const fetchRegionsFailed = (error) => {
+    return {
+        type: actionTypes.FETCH_REGIONS_FAILED,
+        error: error
+
+    }
+}
+export const fetchRegions = () => {
+    return dispatch => {
+
+        axios.get('/regions.json')
+            .then(response => {
+                dispatch(fetchRegionsSuccess(response.data))
+            })
+            .catch(error => {
+                dispatch(fetchRegionsFailed(error.message));
+
+            })
+    }
+}

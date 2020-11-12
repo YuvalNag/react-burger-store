@@ -18,7 +18,8 @@ const initialState = {
         'ketchup': true
     },
     products: [],
-    error: false
+    error: false,
+    regions:[]
 
 };
 const addProduct = (state, action) => {
@@ -55,12 +56,17 @@ const fetchProductsSuccess = (state, action) => {
 const fetchProductsFailed = (state, action) => {
     return updateObject(state, {
         error: action.error,
-        products_prices: {
-            'meat': 0,
-            'mushrooms': 0,
-            'salad': 0,
-            'ketchup': 0
-        },
+    });
+}
+const fetchRegionsSuccess = (state, action) => {
+    return updateObject(state, {
+        regions: action.regions,
+        error: false
+    });
+}
+const fetchRegionsFailed = (state, action) => {
+    return updateObject(state, {
+        error: action.error
     });
 }
 
@@ -70,6 +76,8 @@ const reducer = (state = initialState, action) => {
         case actionTypes.REMOVE_PRODUCT: return removeProduct(state, action)
         case actionTypes.FETCH_PRODUCTS_SUCCESS: return fetchProductsSuccess(state, action)
         case actionTypes.FETCH_PRODUCTS_FAILED: return fetchProductsFailed(state, action)
+        case actionTypes.FETCH_REGIONS_SUCCESS: return fetchRegionsSuccess(state, action)
+        case actionTypes.FETCH_REGIONS_FAILED: return fetchRegionsFailed(state, action)
         default: return state;
     }
 };

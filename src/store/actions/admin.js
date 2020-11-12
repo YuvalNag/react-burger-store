@@ -24,6 +24,18 @@ export const tryAddProduct = (order, token) => {
             .catch(error => { dispatch(reqToServerFail(error.message)) })
     }
 }
+export const tryAddRegion = (region, token) => {
+    return dispatch => {
+        dispatch(reqToServerStart())
+        const queryParams = '?auth=' + token
+        axios.post('/regions.json' + queryParams, region)
+            .then(response => {
+                // dispatch(reqToServer(purchaseBurgerSuccess(response.data.name, order)))
+
+            })
+            .catch(error => { dispatch(reqToServerFail(error.message)) })
+    }
+}
 
 export const purchaseBurgerFinish = () => {
     return {

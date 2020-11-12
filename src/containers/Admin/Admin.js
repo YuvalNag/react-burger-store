@@ -7,6 +7,7 @@ import Modal from '../../components/UI/Modal/Modal';
 import Button from '../../components/UI/Button/Button';
 
 import * as adminActions from '../../store/actions/index'
+import CreateRegion from '../../components/CreateRegion/CreateRegion';
 
 
 
@@ -41,26 +42,50 @@ const Admin = (props) => {
     const orders = useSelector(state => state.order.orders)
 
 
-// const totalPrice=Object.values(orders).reduce(())
-    const onAddProduct = (newProduct) => dispatch(adminActions.tryAddProduct(newProduct, token));
-    useEffect(() => dispatch(adminActions.tryFetchOrders(token), []));
+    // const totalPrice=Object.values(orders).reduce(())
+    const onAddProduct = (newProduct) =>{ dispatch(adminActions.tryAddProduct(newProduct, token))};
+    const onAddRegion = (newRegion) =>{ dispatch(adminActions.tryAddRegion(newRegion, token))};
+
+    useEffect(() => dispatch(adminActions.tryFetchOrders(token)),[]);
 
 
     const [show, setShow] = useState(false)
+    const [modalType, setModalType] = useState('')
+    const getModalContent = () => {
+        switch (modalType) {
+            case 'product':
+                return <CreateProduct
+
+                    cancelled={() => setShow(false)}
+                    continued={onAddProduct} />
+            case 'region':
+                return <CreateRegion
+                    cancelled={() => setShow(false)}
+                    continued={onAddRegion} />
+            default:
+                return '';
+        }
+    }
     return (
         <Fragment>
             <Modal
                 show={show}
                 modelClosed={() => setShow(false)}
-            >
-                <CreateProduct
-
-                    purchaseCancelled={() => setShow(false)}
-                    purchaseContinued={onAddProduct} />
+            >{
+                    getModalContent()
+                }
             </Modal>
             <Button btnType='Success'
-                clicked={() => setShow(true)}>הוסף מוצר</Button>
-                <h1> מספר הזמנות: {Object.values(orders).length}</h1>
+                clicked={() => {
+                    setModalType('product')
+                    setShow(true)
+                }}>הוסף מוצר</Button>
+            <Button btnType='Success'
+                clicked={() => {
+                    setModalType('region')
+                    setShow(true)
+                }}>הוסף אזור חלוקה</Button>
+            <h1> מספר הזמנות: {Object.values(orders).length}</h1>
         </Fragment>
     )
 }

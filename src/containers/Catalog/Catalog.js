@@ -60,16 +60,23 @@ const Catalog = (props) => {
         if (selectedProducts[productKey]) {
             selectedProducts[productKey] = selectedProducts[productKey] - 1
         }
+        else if (selectedProducts[productKey] === 0) {
+            delete selectedProducts[productKey]
+        }
         else {
             console.error('product key is not exist');
         }
         setSelectedProducts({ ...selectedProducts })
     };
     const products = useSelector(state => state.catalog.products)
+    const regions = useSelector(state => state.catalog.regions)
 
     const [show, setShow] = useState(false)
 
-    useEffect(() => dispatch(catalogActions.fetchProducts()), [])
+    useEffect(() => {
+        dispatch(catalogActions.fetchProducts())
+        dispatch(catalogActions.fetchRegions())
+                        }, [])
 
     const totalPrice = Object.keys(products)
         .filter(productKey => selectedProducts[productKey])
@@ -87,9 +94,9 @@ const Catalog = (props) => {
                 modelClosed={() => setShow(false)}
             >
                 <OrderSummary
-
-                    purchaseCancelled={() => setShow(false)}
-                    purchaseContinued={onPurchase}
+regions={regions}
+                    cancelled={() => setShow(false)}
+                    continued={onPurchase}
                 />
             </Modal>
             <div
@@ -115,7 +122,7 @@ const Catalog = (props) => {
                 }}
             >
 
-                <BottomNavigationAction label="הזמן עכשיו" icon={<ShoppingCartOutlined />} onClick={() => setShow(true)} />
+                <BottomNavigationAction label="הזמן עכשיו" icon={<ShoppingCartOutlined />} disabled={totalPrice < 1} onClick={() => setShow(true)} />
                 <Typography align="center" color='textSecondary' variant='p' component='p' style={{ alignSelf: 'center', fontWeight: 'bold' }}>
                     סיכום:  ₪{totalPrice}
 
